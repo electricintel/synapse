@@ -1,0 +1,25 @@
+docker run -v /tmp/data:/data -e SERVER_NAME=riot.tenx.tech -e REPORT_STATS=no synapsedev_synapse generate
+
+docker run --restart unless-stopped -d -p 8448:8448 -p 3478:3478 -p 8008:8008 -v /tmp/data:/data synapsedev_synapse start
+
+docker-machine create --driver amazonec2 --amazonec2-instance-type m4.xlarge --amazonec2-root-size 40 --amazonec2-volume-type gp2 --amazonec2-security-group launch-wizard-3 --amazonec2-region us-east-2 aws-matrix-test-dev
+
+
+35 2 * * 1 sudo cp /etc/letsencrypt/live/riot.tenx.tech/fullchain.pem /tmp/data/riot.tenx.tech.tls.crt
+35 2 * * 1 sudo cp /etc/letsencrypt/live/riot.tenx.tech/privkey.pem /tmp/data/riot.tenx.tech.tls.key
+35 2 * * 1 sudo cp /etc/letsencrypt/live/riot.tenx.tech/privkey.pem /tmp/data/riot.tenx.tech.tls.dh
+
+
+database:
+    name: psycopg2
+    args:
+        user: sa
+        password: 1234qwer
+        database: synapse
+        host: matrix-ar.cdfrndqybule.us-east-2.rds.amazonaws.com
+        cp_min: 5
+        cp_max: 10
+
+
+
+ssh -i "aws-matrix-test-dev.pem" ubuntu@ec2-13-59-229-176.us-east-2.compute.amazonaws.com
